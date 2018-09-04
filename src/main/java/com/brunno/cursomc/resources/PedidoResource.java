@@ -15,11 +15,11 @@ import com.brunno.cursomc.services.PedidoService;
 public class PedidoResource {
 
 	@Autowired
-	private PedidoService pedidoService;
+	private PedidoService service;
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<?> find(@PathVariable Integer id) {
-		Pedido obj = pedidoService.buscar(id);
+	public ResponseEntity<Pedido> find(@PathVariable Integer id) {
+		Pedido obj = service.find(id);
 		return ResponseEntity.ok().body(obj);
 	}
 

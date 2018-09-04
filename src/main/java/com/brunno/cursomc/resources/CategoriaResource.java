@@ -19,20 +19,27 @@ import com.brunno.cursomc.services.CategoriaService;
 public class CategoriaResource {
 
 	@Autowired
-	private CategoriaService categoriaService;
+	private CategoriaService service;
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
-	public ResponseEntity<?> find(@PathVariable Integer id) {
-		Categoria obj = categoriaService.buscar(id);
+	public ResponseEntity<Categoria> find(@PathVariable Integer id) {
+		Categoria obj = service.find(id);
 		return ResponseEntity.ok().body(obj);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<Void> insert(@RequestBody Categoria categoria) {
-		categoria = categoriaService.insert(categoria);
+	public ResponseEntity<Void> insert(@RequestBody Categoria obj) {
+		obj = service.insert(obj);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-				.path("/{id}").buildAndExpand(categoria.getId()).toUri();
+				.path("/{id}").buildAndExpand(obj.getId()).toUri();
 		return ResponseEntity.created(uri).build();
 	}
 
+	@RequestMapping(value="/{id}", method=RequestMethod.PUT)
+	public ResponseEntity<Void> update(@PathVariable Integer id, @RequestBody Categoria obj){
+		obj.setId(id);
+		obj = service.update(obj);	
+		
+		return ResponseEntity.noContent().build();
+	}
 }
