@@ -36,10 +36,10 @@ public class ClienteService {
 
 	@Autowired
 	private EnderecoRepository enderecoRepository;
-	
+
 	@Autowired
 	private BCryptPasswordEncoder pe;
-	
+
 	@Autowired
 	private S3Service s3Service;
 
@@ -47,10 +47,9 @@ public class ClienteService {
 		UserSS user = UserService.authenticated();
 		if (user == null || !user.hasRole(Perfil.ADMIN) && !id.equals(user.getId())) {
 			throw new AuthorizationException("Acesso negado");
-			
+
 		}
-		
-		
+
 		Optional<Cliente> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Cliente.class.getName()));
@@ -89,12 +88,12 @@ public class ClienteService {
 	}
 
 	public Cliente fromDTO(ClienteDTO objDto) {
-		return new Cliente(objDto.getId(), objDto.getNome(), objDto.getEmail(), null, null,null);
+		return new Cliente(objDto.getId(), objDto.getNome(), objDto.getEmail(), null, null, null);
 	}
 
 	public Cliente fromDTO(ClienteNewDTO objDto) {
 		Cliente cli = new Cliente(null, objDto.getNome(), objDto.getEmail(), objDto.getCpfOuCnpj(),
-				TipoCliente.toEnum(objDto.getTipo()),pe.encode(objDto.getSenha()));
+				TipoCliente.toEnum(objDto.getTipo()), pe.encode(objDto.getSenha()));
 		Cidade cid = new Cidade(objDto.getCidadeId(), null, null);
 		Endereco end = new Endereco(null, objDto.getLogradouro(), objDto.getNumero(), objDto.getComplemento(),
 				objDto.getBairro(), objDto.getCep(), cli, cid);
@@ -116,10 +115,21 @@ public class ClienteService {
 		newObj.setNome(obj.getNome());
 		newObj.setEmail(obj.getEmail());
 	}
-	
+
 	public URI uploadProfilePicture(MultipartFile multipartFile) {
+		UserSS user = UserService.authenticated();
+		if (user == null) {
+			throw new AuthorizationException("Acesso negado");
+		}
+
+		URI uri = s3Service.uploadFile(multipartFile);
+
+		Cliente cli = repo.findById(user.getId()).get();
+		cli.setImageUrl(uri.toString());
+		repo.save(cli);
+
 		return s3Service.uploadFile(multipartFile);
-		
+
 	}
-	
+
 }
