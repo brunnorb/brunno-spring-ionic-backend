@@ -26,6 +26,7 @@ public class S3Service {
 
 	@Value("${s3.bucket}")
 	private String bucketName;
+	
 
 	public URI uploadFile(MultipartFile multipartFile) {
 		try {
