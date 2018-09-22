@@ -99,7 +99,7 @@ public class ClienteService {
 			throw new AuthorizationException("Acesso negado");
 		}
 
-		Cliente obj = repo.findByEmail(email) ;
+		Cliente obj = repo.findByEmail(email);
 		if (obj == null) {
 			throw new ObjectNotFoundException(
 					"Objeto não encontrato! Id: " + user.getId() + ", Tipo: " + Cliente.class.getName());
